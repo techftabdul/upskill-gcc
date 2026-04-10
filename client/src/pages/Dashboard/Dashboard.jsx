@@ -92,7 +92,7 @@ const Dashboard = () => {
         <h1>Welcome back, {userData?.name || currentUser?.email || 'User'}!</h1>
         <p>Here is an overview of your AI-powered career tools and recent activity.</p>
         <Link to="/toolkit" style={{ textDecoration: 'none' }}>
-          <Button variant="accent">Open AI Toolkit</Button>
+          <Button variant="accent">Optimize Your Profile Now</Button>
         </Link>
       </div>
 
