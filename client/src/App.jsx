@@ -13,6 +13,7 @@ import ToolkitDashboard from './pages/Toolkit/ToolkitDashboard';
 import AiCvOptimizer from './pages/Toolkit/AiCvOptimizer';
 import AiLinkedInOptimizer from './pages/Toolkit/AiLinkedInOptimizer';
 import SkillGapAnalyzer from './pages/Toolkit/SkillGapAnalyzer';
+import History from './pages/History/History';
 import './App.css';
 
 function App() {
@@ -57,6 +58,11 @@ function App() {
             <Route path="/toolkit/skill-gap" element={
               <ProtectedRoute>
                 <SkillGapAnalyzer />
+              </ProtectedRoute>
+            } />
+            <Route path="/history" element={
+              <ProtectedRoute>
+                <History />
               </ProtectedRoute>
             } />
           </Routes>

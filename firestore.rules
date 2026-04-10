@@ -1,0 +1,55 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ─── User profiles ───────────────────────────────
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // ─── AI Generations (unified history) ────────────
+    match /ai_generations/{docId} {
+      // Users can read their own generations
+      allow read: if request.auth != null
+                  && resource.data.userId == request.auth.uid;
+
+      // Only the backend (Admin SDK) writes to this collection,
+      // so we deny client-side create/update.
+      // Users can delete their own generations.
+      allow delete: if request.auth != null
+                    && resource.data.userId == request.auth.uid;
+
+      // Deny client-side create/update — backend uses Admin SDK which bypasses rules
+      allow create, update: if false;
+    }
+
+    // ─── Legacy collections (CV / LinkedIn / Skill) ──
+    match /cvOptimizations/{docId} {
+      allow read, write: if request.auth != null
+                         && (resource == null || resource.data.userId == request.auth.uid);
+      allow create: if request.auth != null
+                    && request.resource.data.userId == request.auth.uid;
+    }
+
+    match /linkedinOptimizations/{docId} {
+      allow read, write: if request.auth != null
+                         && (resource == null || resource.data.userId == request.auth.uid);
+      allow create: if request.auth != null
+                    && request.resource.data.userId == request.auth.uid;
+    }
+
+    match /skillAnalyses/{docId} {
+      allow read, write: if request.auth != null
+                         && (resource == null || resource.data.userId == request.auth.uid);
+      allow create: if request.auth != null
+                    && request.resource.data.userId == request.auth.uid;
+    }
+
+    // ─── Waitlist (public create, admin read) ────────
+    match /waitlist/{docId} {
+      allow create: if true;
+      allow read, update, delete: if false;
+    }
+  }
+}

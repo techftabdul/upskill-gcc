@@ -34,6 +34,7 @@ const ResultModal = ({
   creditsRemaining = null,
   showDownload = false,
   downloadMeta = {},
+  showRegenerate = true,
 }) => {
   const [copied, setCopied] = useState(false);
 
@@ -117,10 +118,12 @@ const ResultModal = ({
                 <Copy size={15} />
                 {copied ? 'Copied!' : 'Copy Text'}
               </Button>
-              <Button variant="outline" onClick={onRegenerate}>
-                <RefreshCcw size={15} />
-                Regenerate
-              </Button>
+              {showRegenerate && (
+                <Button variant="outline" onClick={onRegenerate}>
+                  <RefreshCcw size={15} />
+                  Regenerate
+                </Button>
+              )}
               {showDownload && (
                 <Button
                   variant="accent"

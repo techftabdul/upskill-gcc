@@ -31,7 +31,10 @@ const Navbar = () => {
           <a href="/#features" className="nav-link">Features</a>
           <a href="/#testimonials" className="nav-link">Testimonials</a>
           {currentUser && (
-            <Link to="/dashboard" className="nav-link">Dashboard</Link>
+            <>
+              <Link to="/dashboard" className="nav-link">Dashboard</Link>
+              <Link to="/history" className="nav-link">History</Link>
+            </>
           )}
           <Link to="/toolkit" className="nav-link">AI Tools</Link>
         </nav>
@@ -71,7 +74,10 @@ const Navbar = () => {
             <a href="/#features" className="mobile-menu__link" onClick={closeMobile}>Features</a>
             <a href="/#testimonials" className="mobile-menu__link" onClick={closeMobile}>Testimonials</a>
             {currentUser && (
-              <Link to="/dashboard" className="mobile-menu__link" onClick={closeMobile}>Dashboard</Link>
+              <>
+                <Link to="/dashboard" className="mobile-menu__link" onClick={closeMobile}>Dashboard</Link>
+                <Link to="/history" className="mobile-menu__link" onClick={closeMobile}>History</Link>
+              </>
             )}
             <Link to="/toolkit" className="mobile-menu__link" onClick={closeMobile}>AI Tools</Link>
 

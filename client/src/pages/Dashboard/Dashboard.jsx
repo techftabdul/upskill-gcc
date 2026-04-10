@@ -1,65 +1,59 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import {
-  getUserCVOptimizations,
-  getUserLinkedinOptimizations,
-  getUserSkillAnalyses,
-  getUserData
-} from '../../firebase/firestore';
+import { getUserData } from '../../firebase/firestore';
+import { getRecentGenerations } from '../../services/historyService';
 import Button from '../../components/ui/Button';
-import { downloadAsPDF } from '../../utils/pdfExport';
-import { Coins, FileText, Linkedin, GraduationCap } from 'lucide-react';
+import ResultModal from '../../components/shared/ResultModal';
+import { Coins, FileText, Linkedin, GraduationCap, ArrowRight, Eye } from 'lucide-react';
 import './Dashboard.css';
+
+// ─── Type config (shared with History) ────────────────────────
+const TYPE_CONFIG = {
+  cv: { label: 'CV Optimization', icon: <FileText size={18} />, color: '#0284c7' },
+  linkedin: { label: 'LinkedIn Optimization', icon: <Linkedin size={18} />, color: '#0a66c2' },
+  'skill-gap': { label: 'Skill Gap Analysis', icon: <GraduationCap size={18} />, color: '#16a34a' },
+};
+
+const formatDate = (iso) => {
+  if (!iso) return 'Just now';
+  return new Date(iso).toLocaleDateString('en-GB', {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+  });
+};
+
+const getPreview = (output) => {
+  if (!output) return '';
+  const cleaned = output.replace(/[#*_`>\-]/g, '').replace(/\n+/g, ' ').trim();
+  return cleaned.length > 80 ? cleaned.slice(0, 80) + '…' : cleaned;
+};
 
 const Dashboard = () => {
   const { currentUser } = useAuth();
-  const [stats, setStats] = useState({ cvs: 0, linkedins: 0, skills: 0 });
   const [recentActivity, setRecentActivity] = useState([]);
-  const [savedCVs, setSavedCVs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [userData, setUserData] = useState(null);
+
+  // Modal state for viewing a generation
+  const [selectedItem, setSelectedItem] = useState(null);
+  const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
       if (!currentUser) return;
 
       try {
+        // Fetch user profile data
         const userDataRes = await getUserData(currentUser.uid);
         if (userDataRes.data) {
           setUserData(userDataRes.data);
         }
 
-        const [cvRes, lnRes, skRes] = await Promise.all([
-          getUserCVOptimizations(currentUser.uid),
-          getUserLinkedinOptimizations(currentUser.uid),
-          getUserSkillAnalyses(currentUser.uid)
-        ]);
-
-        const cvs = cvRes.data || [];
-        const linkedins = lnRes.data || [];
-        const skills = skRes.data || [];
-
-        setStats({
-          cvs: cvs.length,
-          linkedins: linkedins.length,
-          skills: skills.length
-        });
-
-        setSavedCVs(cvs);
-
-        // Combine and sort for recent activity
-        const combined = [
-          ...cvs.map(i => ({ ...i, type: 'CV Optimization', icon: 'cv' })),
-          ...linkedins.map(i => ({ ...i, type: 'LinkedIn Optimization', icon: 'linkedin' })),
-          ...skills.map(i => ({ ...i, type: 'Skill Analysis', icon: 'skill' }))
-        ].sort((a, b) => {
-          const timeA = a.createdAt?.toMillis ? a.createdAt.toMillis() : Date.now();
-          const timeB = b.createdAt?.toMillis ? b.createdAt.toMillis() : Date.now();
-          return timeB - timeA;
-        }).slice(0, 5);
-
-        setRecentActivity(combined);
+        // Fetch recent AI generations from the unified collection
+        const recent = await getRecentGenerations(5);
+        setRecentActivity(recent);
       } catch (error) {
         console.error('Error fetching dashboard data:', error);
       } finally {
@@ -75,6 +69,22 @@ const Dashboard = () => {
   }
 
   const credits = userData?.credits ?? 0;
+
+  // Compute stats from recent activity (or show 0)
+  const stats = {
+    cvs: recentActivity.filter((g) => g.type === 'cv').length,
+    linkedins: recentActivity.filter((g) => g.type === 'linkedin').length,
+    skills: recentActivity.filter((g) => g.type === 'skill-gap').length,
+  };
+
+  const handleView = (item) => {
+    setSelectedItem(item);
+    setShowModal(true);
+  };
+
+  const typeConfig = selectedItem
+    ? TYPE_CONFIG[selectedItem.type] || TYPE_CONFIG.cv
+    : TYPE_CONFIG.cv;
 
   return (
     <div className="dashboard-container">
@@ -126,51 +136,72 @@ const Dashboard = () => {
         </div>
       </div>
 
+      {/* Recent Activity */}
       <div className="dashboard-activity">
-        <h2>Recent Activity</h2>
+        <div className="dashboard-activity__header">
+          <h2>Recent Activity</h2>
+          {recentActivity.length > 0 && (
+            <Link to="/history" className="dashboard-activity__link">
+              View All <ArrowRight size={16} />
+            </Link>
+          )}
+        </div>
+
         {recentActivity.length === 0 ? (
           <p className="no-activity">You haven't generated any AI results yet.</p>
         ) : (
-          <ul className="activity-list">
-            {recentActivity.map((activity, index) => (
-              <li key={index} className="activity-item">
-                <div className="activity-type">{activity.type}</div>
-                <div className="activity-role">Target Role: {activity.targetRole || 'N/A'}</div>
-                <div className="activity-date">
-                  {activity.createdAt?.toMillis ? new Date(activity.createdAt.toMillis()).toLocaleDateString() : 'Just now'}
+          <div className="activity-cards">
+            {recentActivity.map((item) => {
+              const config = TYPE_CONFIG[item.type] || TYPE_CONFIG.cv;
+              return (
+                <div key={item.id} className="activity-card">
+                  <div
+                    className="activity-card__icon"
+                    style={{ backgroundColor: `${config.color}15`, color: config.color }}
+                  >
+                    {config.icon}
+                  </div>
+                  <div className="activity-card__info">
+                    <span className="activity-card__type">{config.label}</span>
+                    <span className="activity-card__preview">{getPreview(item.output)}</span>
+                    <span className="activity-card__date">{formatDate(item.createdAt)}</span>
+                  </div>
+                  <button
+                    className="activity-card__view-btn"
+                    onClick={() => handleView(item)}
+                    title="View full result"
+                  >
+                    <Eye size={16} />
+                  </button>
                 </div>
-              </li>
-            ))}
-          </ul>
+              );
+            })}
+          </div>
         )}
       </div>
 
-      {savedCVs.length > 0 && (
-        <div className="saved-cvs-section">
-          <h2>Saved CVs</h2>
-          <div className="saved-cvs-list">
-            {savedCVs.map((cv, index) => (
-              <div key={index} className="saved-cv-card">
-                <div className="saved-cv-info">
-                  <p className="saved-cv-role">{cv.targetRole || 'General Professional'}</p>
-                  <p className="saved-cv-meta">
-                    {cv.targetCountry} &bull;&nbsp;
-                    {cv.createdAt?.toMillis ? new Date(cv.createdAt.toMillis()).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : 'Just now'}
-                  </p>
-                </div>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => downloadAsPDF(cv.optimizedCV || '', cv.targetRole, cv.targetCountry)}
-                  className="saved-cv-download-btn"
-                >
-                  ⬇ Download PDF
-                </Button>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
+      {/* Result Viewer Modal */}
+      <ResultModal
+        isOpen={showModal && !!selectedItem}
+        onClose={() => { setShowModal(false); setSelectedItem(null); }}
+        onRegenerate={() => setShowModal(false)}
+        result={selectedItem?.output || ''}
+        title={typeConfig.label}
+        icon={typeConfig.icon}
+        accentColor={typeConfig.color}
+        tags={
+          selectedItem?.input
+            ? Object.values(selectedItem.input).filter(Boolean).slice(0, 3)
+            : []
+        }
+        creditsRemaining={null}
+        showDownload={true}
+        downloadMeta={{
+          targetRole: selectedItem?.input?.targetRole || '',
+          targetCountry: selectedItem?.input?.targetCountry || '',
+        }}
+        showRegenerate={false}
+      />
     </div>
   );
 };

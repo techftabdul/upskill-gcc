@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import aiRoutes from './src/routes/ai.js';
+import historyRoutes from './src/routes/history.js';
 
 dotenv.config();
 
@@ -32,6 +33,7 @@ app.use(express.json());
 
 // ─── Routes ──────────────────────────────────────────────────
 app.use('/api/ai', aiRoutes);
+app.use('/api/history', historyRoutes);
 
 // ─── Health Check ─────────────────────────────────────────────
 app.get('/', (req, res) => {

@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import admin from 'firebase-admin';
 import OpenAI from 'openai';
 import multer from 'multer';
 import fs from 'fs';
@@ -49,6 +50,23 @@ async function checkAndDeductCredit(uid) {
   return { creditsRemaining: credits - 1, userData };
 }
 
+// ─── Save AI generation to Firestore ──────────────────────────
+async function saveGeneration(uid, { type, input, output, creditsUsed = 1 }) {
+  try {
+    await adminDb.collection('ai_generations').add({
+      userId: uid,
+      type,
+      input,
+      output,
+      creditsUsed,
+      createdAt: admin.firestore.FieldValue.serverTimestamp(),
+    });
+  } catch (err) {
+    // Log but don't fail the request — the user already got their result
+    console.error('Failed to save AI generation:', err.message);
+  }
+}
+
 // ─── File text extraction ─────────────────────────────────────
 async function extractTextFromFile(file) {
   const buffer = fs.readFileSync(file.path);
@@ -56,8 +74,10 @@ async function extractTextFromFile(file) {
   try {
     if (file.mimetype === 'application/pdf' || file.originalname?.endsWith('.pdf')) {
       const { PDFParse } = await import('pdf-parse');
-      const data = await PDFParse(buffer);
-      return data.text;
+      const parser = new PDFParse({ data: buffer });
+      const result = await parser.getText();
+      await parser.destroy();
+      return result.text;
     }
 
     if (
@@ -116,8 +136,17 @@ router.post('/generate-cv', verifyToken, upload.single('cvFile'), async (req, re
       temperature: 0.7,
     });
 
+    const aiResult = response.choices[0].message.content;
+
+    // Save to ai_generations
+    await saveGeneration(req.user.uid, {
+      type: 'cv',
+      input: { targetRole: targetRole || 'General Professional', targetCountry: targetCountry || 'GCC' },
+      output: aiResult,
+    });
+
     res.json({
-      result: response.choices[0].message.content,
+      result: aiResult,
       creditsRemaining,
     });
   } catch (error) {
@@ -150,8 +179,17 @@ router.post('/optimize-linkedin', verifyToken, async (req, res) => {
       temperature: 0.7,
     });
 
+    const aiResult = response.choices[0].message.content;
+
+    // Save to ai_generations
+    await saveGeneration(req.user.uid, {
+      type: 'linkedin',
+      input: { headline, role, careerGoal, targetCountry },
+      output: aiResult,
+    });
+
     res.json({
-      result: response.choices[0].message.content,
+      result: aiResult,
       creditsRemaining,
     });
   } catch (error) {
@@ -184,8 +222,17 @@ router.post('/skill-gap', verifyToken, async (req, res) => {
       temperature: 0.7,
     });
 
+    const aiResult = response.choices[0].message.content;
+
+    // Save to ai_generations
+    await saveGeneration(req.user.uid, {
+      type: 'skill-gap',
+      input: { currentSkills, targetRole, targetCountry },
+      output: aiResult,
+    });
+
     res.json({
-      result: response.choices[0].message.content,
+      result: aiResult,
       creditsRemaining,
     });
   } catch (error) {
