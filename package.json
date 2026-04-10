@@ -1,0 +1,13 @@
+{
+  "name": "upskill",
+  "version": "1.0.0",
+  "description": "UpSkill monorepo - client + backend",
+  "scripts": {
+    "dev": "concurrently --names \"CLIENT,BACKEND\" --prefix-colors \"cyan,yellow\" \"npm run dev --prefix client\" \"npm run dev --prefix backend\"",
+    "dev:client": "npm run dev --prefix client",
+    "dev:backend": "npm run dev --prefix backend"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  }
+}
