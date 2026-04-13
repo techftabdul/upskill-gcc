@@ -12,10 +12,9 @@ const PORT = process.env.PORT || 5000;
 // ─── Middleware ───────────────────────────────────────────────
 // Allow multiple local dev ports (Vite may pick 5173 or 5174+)
 const allowedOrigins = [
-  process.env.CLIENT_URL || 'http://localhost:5173',
   'http://localhost:5173',
-  'http://localhost:5174',
-  'http://localhost:5175',
+  'https://upskill-gcc.netlify.app',
+
 ];
 
 app.use(cors({
