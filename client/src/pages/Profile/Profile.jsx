@@ -4,6 +4,7 @@ import { updateUserData } from '../../firebase/firestore';
 import { GCC_COUNTRIES } from '../../utils/countryList';
 import Button from '../../components/ui/Button';
 import { Coins } from 'lucide-react';
+import { getFriendlyErrorMessage } from '../../utils/errorMessages';
 import './Profile.css';
 
 const Profile = () => {
@@ -49,7 +50,7 @@ const Profile = () => {
       setSuccessMsg('Profile updated successfully!');
       setTimeout(() => setSuccessMsg(''), 3000);
     } catch (err) {
-      setError(err.message || 'Failed to update profile.');
+      setError(getFriendlyErrorMessage(err, 'Failed to update profile.'));
     } finally {
       setIsSaving(false);
     }

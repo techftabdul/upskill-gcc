@@ -14,6 +14,7 @@ import { useAuth } from '../../context/AuthContext';
 import { getUserGenerations, deleteGeneration } from '../../services/historyService';
 import ResultModal from '../../components/shared/ResultModal';
 import Button from '../../components/ui/Button';
+import { getFriendlyErrorMessage } from '../../utils/errorMessages';
 import './History.css';
 
 // ─── Helpers ──────────────────────────────────────────────────
@@ -80,7 +81,7 @@ const History = () => {
         const data = await getUserGenerations(100);
         setGenerations(data);
       } catch (err) {
-        setError(err.message);
+        setError(getFriendlyErrorMessage(err, 'Failed to load history.'));
       } finally {
         setLoading(false);
       }

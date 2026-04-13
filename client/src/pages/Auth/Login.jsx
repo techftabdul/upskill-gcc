@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { getFriendlyErrorMessage } from '../../utils/errorMessages';
 import './Auth.css';
 
 const Login = () => {
@@ -33,7 +34,7 @@ const Login = () => {
         navigate('/dashboard');
       }
     } catch (err) {
-      setError(err.message || 'Failed to sign in. Please check your credentials.');
+      setError(getFriendlyErrorMessage(err, 'Failed to sign in. Please check your credentials.'));
     } finally {
       setLoading(false);
     }

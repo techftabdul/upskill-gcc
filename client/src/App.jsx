@@ -14,6 +14,7 @@ import AiCvOptimizer from './pages/Toolkit/AiCvOptimizer';
 import AiLinkedInOptimizer from './pages/Toolkit/AiLinkedInOptimizer';
 import SkillGapAnalyzer from './pages/Toolkit/SkillGapAnalyzer';
 import History from './pages/History/History';
+import Bootcamps from './pages/Bootcamps/Bootcamps';
 import './App.css';
 
 function App() {
@@ -28,6 +29,7 @@ function App() {
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
             <Route path="/demo" element={<DashboardPreview />} />
+            <Route path="/bootcamps" element={<Bootcamps />} />
             
             {/* Protected Routes */}
             <Route path="/dashboard" element={

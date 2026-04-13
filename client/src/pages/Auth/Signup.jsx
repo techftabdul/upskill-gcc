@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { saveUserData } from '../../firebase/firestore';
+import { getFriendlyErrorMessage } from '../../utils/errorMessages';
 import './Auth.css';
 
 const Signup = () => {
@@ -59,7 +60,7 @@ const Signup = () => {
         navigate('/dashboard');
       }
     } catch (err) {
-      setError(err.message || 'Failed to create an account.');
+      setError(getFriendlyErrorMessage(err, 'Failed to create an account.'));
     } finally {
       setLoading(false);
     }

@@ -7,6 +7,7 @@ import { analyzeSkillGap } from '../../services/aiService';
 import { useAuth } from '../../context/AuthContext';
 import { saveSkillAnalysis } from '../../firebase/firestore';
 import { GCC_COUNTRIES } from '../../utils/countryList';
+import { getFriendlyErrorMessage } from '../../utils/errorMessages';
 import './AITool.css';
 
 const SkillGapAnalyzer = () => {
@@ -49,11 +50,7 @@ const SkillGapAnalyzer = () => {
         });
       }
     } catch (err) {
-      if (err.code === 'NO_CREDITS') {
-        setError('You have no credits remaining. Please upgrade your plan to continue.');
-      } else {
-        setError(err.message || 'An error occurred while communicating with the AI.');
-      }
+      setError(getFriendlyErrorMessage(err, 'An error occurred while communicating with the AI.'));
     } finally {
       setIsGenerating(false);
     }

@@ -37,6 +37,7 @@ const Navbar = () => {
             </>
           )}
           <Link to="/toolkit" className="nav-link">AI Tools</Link>
+          <Link to="/bootcamps" className="nav-link">Bootcamps</Link>
         </nav>
 
         <div className="navbar-actions navbar-actions--desktop">
@@ -80,6 +81,7 @@ const Navbar = () => {
               </>
             )}
             <Link to="/toolkit" className="mobile-menu__link" onClick={closeMobile}>AI Tools</Link>
+            <Link to="/bootcamps" className="mobile-menu__link" onClick={closeMobile}>Bootcamps</Link>
 
             <div className="mobile-menu__divider" />
 

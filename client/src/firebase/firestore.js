@@ -190,3 +190,22 @@ export const getUserSkillAnalyses = async (userId) => {
     return { data: [], error: error.message };
   }
 };
+
+// ════════════════════════════════════════════════════════════════
+// COURSE FEEDBACK
+// ════════════════════════════════════════════════════════════════
+
+export const saveCourseFeedback = async ({ userId, suggestedCourse, feedbackReason }) => {
+  try {
+    const docRef = await addDoc(collection(db, 'course_feedback'), {
+      userId: userId || null,
+      suggestedCourse,
+      feedbackReason,
+      createdAt: serverTimestamp(),
+    });
+    return { success: true, id: docRef.id, error: null };
+  } catch (error) {
+    console.error('Error saving course feedback:', error);
+    return { success: false, error: error.message };
+  }
+};
