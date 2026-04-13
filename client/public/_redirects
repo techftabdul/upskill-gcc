@@ -1,0 +1,5 @@
+# Netlify SPA fallback
+# Rewrite every route to index.html so React Router handles all navigation.
+# Status 200 = silent rewrite (URL stays unchanged in the browser).
+# Without this, Netlify returns 404 on any direct URL or page refresh.
+/*    /index.html   200

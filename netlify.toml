@@ -1,0 +1,17 @@
+[build]
+  # Where Netlify should run the build command from
+  base = "client"
+  # Build command
+  command = "npm run build"
+  # Folder to deploy (Vite outputs to dist/)
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "20"
+
+[[redirects]]
+  # SPA fallback — all unmatched paths serve index.html
+  # React Router then handles the routing client-side
+  from = "/*"
+  to = "/index.html"
+  status = 200
