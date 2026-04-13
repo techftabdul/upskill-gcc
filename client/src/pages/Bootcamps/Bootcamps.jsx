@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import {
   Cpu,
   BarChart2,
@@ -298,7 +299,7 @@ const Bootcamps = () => {
                     {!currentUser && (
                       <p className="bootcamps-anon-note">
                         💡 You're submitting anonymously.
-                        <a href="/signup"> Sign up</a> to be notified when your course launches.
+                        <Link to="/signup"> Sign up</Link> to be notified when your course launches.
                       </p>
                     )}
 
