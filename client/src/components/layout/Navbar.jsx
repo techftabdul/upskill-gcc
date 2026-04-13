@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { BookOpen, Menu, X } from 'lucide-react';
 import Button from '../ui/Button';
@@ -17,6 +17,15 @@ const Navbar = () => {
   };
 
   const closeMobile = () => setMobileOpen(false);
+
+  // Close the menu automatically when resizing past the hamburger breakpoint
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth > 1100) setMobileOpen(false);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   return (
     <header className="navbar">
@@ -62,7 +71,8 @@ const Navbar = () => {
         <button
           className="navbar-hamburger"
           onClick={() => setMobileOpen(!mobileOpen)}
-          aria-label="Toggle menu"
+          aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
+          aria-expanded={mobileOpen}
         >
           {mobileOpen ? <X size={24} /> : <Menu size={24} />}
         </button>
