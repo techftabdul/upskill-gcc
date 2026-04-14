@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
+import ScrollToTop from './components/shared/ScrollToTop';
 import Navbar from './components/layout/Navbar';
 import Footer from './components/layout/Footer';
 import Home from './pages/Home/Home';
@@ -15,13 +16,15 @@ import AiLinkedInOptimizer from './pages/Toolkit/AiLinkedInOptimizer';
 import SkillGapAnalyzer from './pages/Toolkit/SkillGapAnalyzer';
 import History from './pages/History/History';
 import Bootcamps from './pages/Bootcamps/Bootcamps';
+import Contact from './pages/Contact/Contact';
 import './App.css';
 
 function App() {
   return (
     <AuthProvider>
       <BrowserRouter>
-      <div className="app-container">
+        <ScrollToTop />
+        <div className="app-container">
         <Navbar />
         <main>
           <Routes>
@@ -30,6 +33,7 @@ function App() {
             <Route path="/signup" element={<Signup />} />
             <Route path="/demo" element={<DashboardPreview />} />
             <Route path="/bootcamps" element={<Bootcamps />} />
+            <Route path="/contact" element={<Contact />} />
             
             {/* Protected Routes */}
             <Route path="/dashboard" element={

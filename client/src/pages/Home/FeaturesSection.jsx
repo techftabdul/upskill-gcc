@@ -1,19 +1,19 @@
 import { motion } from 'framer-motion';
-import { Languages, FileText, Code } from 'lucide-react';
+import { Languages, FileText, Code, BriefcaseBusiness } from 'lucide-react';
 import Card from '../../components/ui/Card';
 import './FeaturesSection.css';
 
 const features = [
   {
     id: 1,
-    title: 'Workplace Arabic',
-    description: 'Master the essential vocabulary and etiquette to thrive in GCC corporate environments and build stronger relationships.',
-    icon: <Languages size={32} className="feature-icon-svg text-blue" />,
+    title: 'Skill Gap Analysis',
+    description: 'Get a personalized assessment of your current skills and identify the gaps that are holding you back from landing your dream job in the Gulf.',
+    icon: <BriefcaseBusiness size={32} className="feature-icon-svg text-blue" />,
     colorClass: 'icon-bg-blue'
   },
   {
     id: 2,
-    title: 'GCC CV & LinkedIn',
+    title: 'GCC CV & LinkedIn Optimization',
     description: 'Optimize your professional profile for regional ATS systems and recruiters with our specialized templates and AI tools.',
     icon: <FileText size={32} className="feature-icon-svg text-orange" />,
     colorClass: 'icon-bg-orange'
@@ -37,7 +37,7 @@ const FeaturesSection = () => {
             Expert-led programs designed specifically to bridge the gap between your current experience and the demands of the Gulf job market.
           </p>
         </div>
-        
+
         <div className="features-grid">
           {features.map((feature, index) => (
             <motion.div
